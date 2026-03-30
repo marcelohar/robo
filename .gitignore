@@ -1,0 +1,12 @@
+# para que você nunca suba suas senhas para o GitHub
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Segurança e Credenciais
+.env
+
+# MetaTrader 5
+*.log
