@@ -1,8 +1,29 @@
-# para que você nunca suba suas senhas para o GitHub
+#################################################################
+# Para que você nunca suba suas senhas ou arquivos importantes para o GitHub
+#################################################################
 
-# Python
+# Arquivos temporários do Python
 __pycache__/
-*.pyc
+*.py[cod]
+
+#################################################################
+    # BREVE EXPLICAÇÃO:
+
+    """
+    *.py[cod] é uma expressão regular (RegEx) mais completa.
+
+    pyc: São os arquivos de "Python Compilado". Quando você roda seu robô, o Python traduz seu código para algo que o computador entende mais rápido.
+
+    pyo: Versões otimizadas desses arquivos.
+
+    pyd: Arquivos de biblioteca (DLLs) do Python no Windows.
+
+    Por que usar *.py[cod]?
+    Essa única linha substitui três regras. O colchete [cod] diz ao Git: "Ignore qualquer arquivo que termine em .pyc, .pyo ou .pyd".
+#################################################################
+
+
+# Ambiente Virtual - Onde são baixados os pacotes das bibliotecas utilizadas
 venv/
 
 # Segurança e Credenciais
