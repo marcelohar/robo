@@ -1,7 +1,14 @@
 
 Pressione Ctrl + Shift + V. --> O VS Code vai abrir uma aba ao lado mostrando o "resultado final" bonitão.
 
+***
+### ⚡ Performance: Python vs. MQL5
 
+- **MQL5 (Nativo):** Execução em C++. Menor latência possível. Ideal para High Frequency Trading (HFT).
+- **Python (Wrapper):** Existe um pequeno "atraso" (IPC - Inter-Process Communication) porque o Python precisa enviar o comando para o MT5 via biblioteca.
+- **Veredito:** Para estratégias de médio/curto prazo (não HFT), a riqueza de bibliotecas do Python compensa a pequena perda de velocidade.
+
+***
  # ANTES DE UMA PAUSA (FINALIZAR O DIA)
 
 Para garantir que, quando você voltar, não perca tempo tentando lembrar "onde eu parei?".
@@ -64,14 +71,14 @@ Siga os esses passos para ter certeza que estará criando a pasta venv:
   O comando `python -m venv venv` é o pilar da **Arquitetura de Isolamento** em projetos Python.
 
   ### 🔍 Anatomia do Comando
+  
   | Termo | Função Técnica | Descrição |
   | :--- | :--- | :--- |
   | **`python`** | Executável | Chama o interpretador instalado no Sistema Operacional. |
   | **`-m`** | Flag *Module* | Instrução para o Python executar um **módulo interno** como um script. |
   | **`venv` (1º)** | Módulo | A ferramenta oficial (Standard Library) que cria ambientes isolados. |
   | **`venv` (2º)** | Destino | O nome da **pasta local** que será criada (Convenção de mercado). |
-
-
+   
 
   ### 💡 Conceitos de Engenharia de Software
   1. **Isolamento de Dependências:** Garante que as bibliotecas do robô (ex: `MetaTrader5`) não entrem em conflito com outros projetos no mesmo PC.
@@ -136,17 +143,61 @@ Moral da história: O código é o que você escreve. As bibliotecas são o que 
 
 
 ***
-# ESTRUTURA ATUAL
+# Robô de Monitoramento Multithread
 
-A estrutura até agora:  
-C:/robo/   
-├── venv/               (Pasta de bibliotecas - IGNORADA pelo Git)  
-├── .env                (Suas senhas - IGNORADO pelo Git)  
-├── .gitignore          (Regras de proteção - NA RAIZ)  
-├── requirements.txt    (Lista de dependências - NO GIT)  
-├── leitor_mercado.py   (Seu código principal)  
-└── temporarioTeste.py  (Seu código de testes)  
- 
+### 1 -  Visão Geral  
+O sistema foi redesenhado para separar a captação de dados da tomada de decisão. Em vez de um único fluxo linear, agora temos dois fluxos paralelos que se comunicam através de uma fila segura.
+
+### 2 -  Componentes do Sistema  
+O Vigia (Thread Produtora)
+
+Função: Monitorar o ativo (ex: EURUSD) no MetaTrader 5 na maior velocidade permitida pelo hardware.
+
+- Comportamento:
+1. Roda em uma Thread separada (segundo plano).
+2. Utiliza um loop de alta frequência (time.sleep(0.01)).
+3. Filtragem de Ruído: Só envia dados para a fila se o preço atual (bid) for diferente do último preço registrado. Isso evita processamento desnecessário de dados repetidos.
+4. Publicação: Coloca o novo preço na Queue (Fila).
+
+#### A Fila (Queue - O Canal de Comunicação)
+
+Função: Servir de ponte segura entre as Threads.
+
+#### Por que usar queue.Queue?  
+- No Python, as filas são thread-safe. Isso significa que o "Vigia", pode escrever e o "Estrategista", pode ler ao mesmo tempo sem que um atropele o dado do outro ou cause um crash no sistema (Race Condition).
+
+- O Estrategista (Thread Principal / Consumidor)
+Função: Processar os dados e aplicar a lógica de trading.
+
+### Comportamento:
+
+Utiliza o método `.get()`, que é um bloqueador eficiente. O processador não fica "gastando ciclo" enquanto a fila está vazia; ele entra em estado de espera e acorda instantaneamente quando um dado entra na fila.
+
+* É aqui que, no futuro, colocaremos as condições: `if preco > media_movel: comprar()`.
+
+### Benefícios da Arquitetura
+
+1. Escalabilidade:  
+ Podemos criar vários "Vigias" (um para cada par de moedas como GBPUSD, USDJPY) todos alimentando a mesma fila para um único "Estrategista".
+
+2. Performance:  
+ O programa não "engasga". Se o processamento de uma estratégia demorar 0.5s, o Vigia continua capturando os preços que mudaram nesse meio tempo e os coloca na fila para serem lidos logo em seguida.
+
+3. Estabilidade:  
+ O uso de `daemon=True` garante que, se você interromper o programa principal (Ctrl+C), todas as threads de apoio sejam encerradas automaticamente pelo sistema operacional.
+
+### Glossário para o Engenheiro:
+- `Thread`: Unidade básica de execução que compartilha o mesmo espaço de memória do processo pai.
+
+- `Race Condition`: Problema que ocorre quando duas threads tentam modificar o mesmo dado ao mesmo tempo (evitado aqui pelo uso da Queue).
+
+- `Daemon Thread`: Uma thread que roda em segundo plano e não impede o programa de encerrar.
 
 
+***
+# ESTRATÉGIA DE TESTE (MERCADO FECHADO)
+### 🧪 Estratégias de Teste (Mercado Fechado)
 
+1. **Mock (Simulação de Fluxo):** Criar uma função que substitui o MT5 e envia preços aleatórios para a `Queue`. Ideal para testar a **arquitetura** do código.
+2. **Backtest (Dados Históricos):** Usar `mt5.copy_rates_from_pos` para baixar preços passados. Ideal para validar a **estratégia** matemática (médias, RSI, etc).
+3. **Vantagem:** Permite desenvolver o robô 24/7, independente do horário da corretora.
