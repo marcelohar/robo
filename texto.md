@@ -28,6 +28,17 @@ Aqui está o seu Protocolo de Pausa Segura:
 Certifique-se de que todos os arquivos no VS Code estão salvos (Ctrl + S). Se a bolinha branca no topo da aba sumiu, está salvo.  
 
 3 O Ritual do Git (O envio real)  
+
+👤 Identidade do Git
+
+Sempre que configurar uma máquina nova, defina quem você é para o histórico do código:
+
+- **Nome:** `git config --global user.name "Seu Nome"`. O nome que aparecerá ao lado dos seus "commits" (quem fez a alteração).  
+
+- **E-mail:** `git config --global user.email "seu@email.com"`. O e-mail que liga suas alterações à sua conta do GitHub.
+
+- **Verificar:** `git config --list` (Mostra se as configurações entraram).
+
 Agora que os arquivos refletem exatamente o seu progresso, você faz os comandos:  
 
 `git add .`  
