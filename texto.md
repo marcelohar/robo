@@ -97,7 +97,85 @@ Siga os esses passos para ter certeza que estará criando a pasta venv:
 Despois de preparar nossa pasta 'venv' de configuração para cada projeto, vamos prepara um arquivo 'requirements' para baixar automaticamente todas as bibliotecas que o nosso projeto vai precisar para rodar.  
  - Digite no terminal: `pip freeze > requirements.txt`  
 
-   * Fazer isso sempre que baixar um novo pacote
+  Fazer isso sempre que baixar um novo pacote
+
+***
+# 📝 Guia de Instalação e Sincronização (Ambiente Novo)
+
+Este guia serve para configurar o projeto `rb-cruza-medias` em qualquer computador novo (trabalho ou casa).
+
+### 1. Ferramentas de Base
+- **Git**: Instalar para clonar o projeto.
+- **Python**: Instalar marcando a opção **"Add Python to PATH"**.
+
+### 2. Clonar o Repositório
+No terminal do VS Code, dentro da pasta onde os robôs ficarão:  
+
+```
+git clone https://github.com/SEU_USUARIO/rb-cruza-medias.git .
+
+* Git Clone: Copia tudo da nuvem para o PC local.
+```
+
+### 3. Liberar o Sistema (Windows)
+Permitir que o Windows execute o script da venv (executar apenas uma vez na máquina):
+
+```
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+* Set-ExecutionPolicy: Muda a regra de segurança do Windows para aceitar scripts Python.
+```
+
+
+### 4. Criar o Ambiente Isolado (venv)
+Criar a "caixa" onde as bibliotecas do robô serão instaladas:
+
+```
+python -m venv venv
+
+* 🔧 Resumo Técnico
+    - **Comando:** `python -m venv venv`
+    - **python:** Chama o executor.
+    - **-m:** Avisa que vou usar uma ferramenta interna (módulo).
+    - **venv:** Ferramenta que cria o ambiente isolado.
+    - **venv (final):** Nome da pasta que será criada no projeto.
+
+    **Objetivo:** Criar uma "bolha" para o robô não entrar em conflito com outros programas do PC.  
+
+```
+### 5. Ativar o Ambiente
+Entrar na bolha para começar a trabalhar (deve aparecer (venv) no terminal):
+```
+.\venv\Scripts\activate
+
+* Activate: Liga o interruptor do ambiente virtual.
+```
+
+### 6. Instalar Dependências
+Baixar as bibliotecas listadas no seu arquivo de requisitos:
+
+```
+pip install -r requirements.txt
+
+* O comando `pip install -r requirements.txt` reconstrói o ambiente em qualquer máquina.
+
+- `-r` (Requirements): Flag que indica que o próximo item é um arquivo de texto com a lista de pacotes e versões.
+
+- `requirements.txt`: O arquivo "receita" que o Git salvou.
+```
+
+### **Dica de Engenheiro:**
+Lembre-se que o arquivo `.env` (com suas senhas) não vem no `git clone`. Você precisa criá-lo manualmente agora para o robô conseguir conectar.
+
+### **Fluxo de Engenharia:**
+1. Você recebe o código do Git (sem a pasta `venv`).
+2. Cria uma `venv` nova.
+3. Roda o `pip install -r` para baixar tudo de uma vez.
+
+Pronto! Em segundos, o Python baixa tudo de novo, mas agora configurado perfeitamente para esse novo computador.  
+
+Moral da história: O código é o que você escreve. As bibliotecas são o que você requisita. O Git guarda apenas o que é seu código.
+
 
 
    
@@ -108,38 +186,7 @@ Despois de preparar nossa pasta 'venv' de configuração para cada projeto, vamo
 
 Bastar ter um arquivo com esse nome '.gitignore' na raiz do projeto, com as informações do que não dever ser enviado para o git remoto que o próprio git identifica que não é para usar o que está dentro dele.
 
-***
-# JUNTANDO TUDO
 
-Depois de tudo configurado, vamos guardar no repositorio git remoto, somente os codigo e se precisar dos arquivo de configuracao e pacotes baixados basta:  
-
-"Recupera" tudo em outro PC. O fluxo de um engenheiro sênior é este:  
-
-- Você faz o git clone do seu projeto em um PC novo.  
-
-- Você verá que a pasta venv não está lá (graças ao .gitignore).  
-
-- Você cria uma venv nova e limpa: No terminal: `python -m venv venv.`  
-
-- Você diz ao Python: "Leia a lista de compras e instale tudo":  
-
-  `pip install -r requirements.txt`  
-
-O comando `pip install -r requirements.txt` reconstrói o ambiente em qualquer máquina.
-
-- **`-r` (Requirements):** Flag que indica que o próximo item é um arquivo de texto com a lista de pacotes e versões.
-- **`requirements.txt`:** O arquivo "receita" que o Git salvou.
-
-
-
-**Fluxo de Engenharia:**
-1. Você recebe o código do Git (sem a pasta `venv`).
-2. Cria uma `venv` nova.
-3. Roda o `pip install -r` para baixar tudo de uma vez.
-
-Pronto! Em segundos, o Python baixa tudo de novo, mas agora configurado perfeitamente para esse novo computador.  
-
-Moral da história: O código é o que você escreve. As bibliotecas são o que você requisita. O Git guarda apenas o que é seu código.
 
 
 ***
