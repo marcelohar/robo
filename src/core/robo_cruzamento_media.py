@@ -7,7 +7,7 @@ import  threading
 
 from    queue       import Queue
 from    dotenv      import load_dotenv
-from    vigia_EURUSD_thread import vigia
+from    src.services.vigia_EURUSD_thread import vigia
 
 
 ######################################################################################
@@ -15,7 +15,6 @@ from    vigia_EURUSD_thread import vigia
 load_dotenv()
 
 # Pegar os dados do .env e converter para o tipo ceto
-
 login_mt5       = int(os.getenv("MT5_LOGIN"))
 senha_mt5       = os.getenv("MT5_PASSWORD")
 servidor_mt5    = os.getenv("MT5_SERVER")
@@ -25,15 +24,15 @@ servidor_mt5    = os.getenv("MT5_SERVER")
 # Ligando o motor: O python se conecta ao MetaTrader 5
 
 if not mt5.initialize(login = login_mt5, password = senha_mt5, server = servidor_mt5):
-    print(f"X Falha ao conectar com o MetaTrader 5: {mt5.last_error()}")    
+    print(f"X   Falha ao conectar com o MetaTrader 5: {mt5.last_error()}")    
     mt5.shutdown()  # 5. Desligando o motor
     quit()          # Encerrar
 else:
-    print("\n$ Conectado com sucesso usando os dados do .env!")
+    print("\n$  Conectado com sucesso usando os dados do .env!")
 
 ######################################################################################
 # Criando a fila para os novos preços
-fila_de_precos  = Queue()
+fila_de_precos  = Queue()   # Buffer de segurança para garantir que nenhum tick de preço seja perdido.
 
 ######################################################################################
 # Escolhendo o "produto": Vamos olhar para o Euro x Dólar (EURUSD)
@@ -44,14 +43,14 @@ ativo = "EURUSD"
 # DISPARA O VIGIA (Que está no outro arquivo)
 # O target agora aponta para a função importada
 t = threading.Thread(target = vigia, args = (ativo, fila_de_precos), daemon = True)
-t.start()
+t.start()   # inicia a linha de produção (threading)
 
 print(f"\n$ Robô ligado! Aguardando o valor do {ativo}...")
 
 # LOOP DO ESTRATEGISTA (Processamento do robo -) (Onde a mágica acontece)
 try:
     while True:
-        # O .get() trava aqui até o vigia colocar um pre;o na fila
+        # O .get() trava aqui até o vigia colocar um preço na fila
         preco_atual = fila_de_precos.get()
 
         hora = time.strftime('%H:%M:%S')

@@ -1,0 +1,1 @@
+src/utils/: Use para arquivos que fazem coisas genéricas, como enviar mensagens no Telegram ou formatar números.

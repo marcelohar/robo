@@ -3,8 +3,6 @@
 import  MetaTrader5 as mt5
 import  os
 import  time
-import  threading
-from    queue import Queue
 from    dotenv import load_dotenv
 
 
@@ -21,7 +19,7 @@ if not mt5.initialize(login=login_mt5, password=senha_mt5, server=servidor_mt5):
     quit()
 
 ######################################################################################
-
+#   caixa seria a Quieui
 def vigia(nome_ativo, caixa):
     ultimo_bid = 0
     print(f"Vigia iniciado para o ativo: {nome_ativo}")
